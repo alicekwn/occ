@@ -6,10 +6,20 @@ import numpy as np
 import itertools
 from math import prod
 from typing import Iterable
-import itertools
 
 
 class ApproximatedResult:
+    """
+    Approximated results for the union and intersection distributions using CLT.
+
+    Args:
+        total_number: The total number of elements.
+        shard_sizes: The sizes of the shards.
+
+    Returns:
+        Approximated results for the univariate and bivariate distributions using CLT.
+    """
+
     def __init__(self, total_number: int, shard_sizes: list[int]):
         self.total_number = total_number
         self.shard_sizes = shard_sizes
@@ -158,6 +168,29 @@ class ApproximatedResult:
             if self.union_p_approx() > 0
             else 0
         )
+
+    # --- Independent approximated results ---
+    def var(self, probability: float) -> float:
+        return self.total_number * probability * (1 - probability)
+
+
+# class IndependentApproximation:
+#     """
+#     Assuming the distributions are independent, calculate the mean and variance of the union and intersection distributions.
+
+#     Args:
+#         total_number: The total number of elements.
+#         shard_sizes: The sizes of the shards.
+
+#     Returns:
+#         Mean and variance of the union and intersection distributions.
+#     """
+
+#     def __init__(self, total_number: int, shard_sizes: list[int]):
+#         self.total_number = total_number
+#         self.shard_sizes = shard_sizes
+#         self.party_number = len(shard_sizes)
+#         self.alpha = np.array(shard_sizes) / self.total_number
 
 
 if __name__ == "__main__":
