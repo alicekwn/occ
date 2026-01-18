@@ -13,11 +13,11 @@ from occenv.utils import (
     sse_calculation,
     norm_pdf,
 )
-from occenv.plotting_2d import plot_line_graph, plot_pmf_with_normals
+from occenv.plotting_2d import plot_pmf_with_normals
 from occenv.approximated import ApproximatedResult
 
-N = 10
-shard_sizes = (3, 4, 5)
+N = 200
+shard_sizes = (15, 14, 16)
 m = len(shard_sizes)
 
 analytical = AnalyticalUnivariate(N, shard_sizes)
@@ -42,15 +42,22 @@ for problem, label in problems.items():
     normal_analytical = norm_pdf(x_continuous, mu_analytical, sigma_analytical)
 
     # Calculate the approximated mean and standard deviation of the discrete PMF (using CLT)
-    mu_approx_method = getattr(approx, f"{problem.lower()}_mu_approx")
+    p_approx = getattr(approx, f"{problem.lower()}_p_approx")
     sd_approx_method = getattr(approx, f"{problem.lower()}_sd_approx")
-    mu_approx = mu_approx_method()
+    mu_approx = approx.mu_sum_indicators(p_approx())
     sd_approx = sd_approx_method()
     normal_approx = norm_pdf(x_continuous, mu_approx, sd_approx)
 
     # Error between the two normal distributions
     mae_norm = mae_calculation(normal_analytical, normal_approx)
     sse_norm = sse_calculation(normal_analytical, normal_approx)
+
+    # Assume iid, calculate the variance
+    sd_assume_iid = np.sqrt(approx.var_individuals(p_approx()))
+
+    # Error between the approximated variance and the variance assuming iid
+    mae_var = mae_calculation(sigma_analytical, sd_assume_iid)
+    sse_var = sse_calculation(sigma_analytical, sd_assume_iid)
 
     # Plot the bar chart of the discrete PMF and plot the normal approximation on top of the PMF
     plot_pmf_with_normals(
@@ -74,15 +81,32 @@ for problem, label in problems.items():
     )
     print(f"Error between the two normals: MAE = {mae_norm:.5f}, SSE = {sse_norm:.5f}")
 
-    # Plot the complementary cumulative distribution function and the cumulative distribution function
-    cdf = np.cumsum(pmf)
-    ccdf = np.cumsum(pmf[::-1])[::-1]
-    plot_line_graph(
+    # To show that the iid assumption is not always correct, we plot the error between the approximated variance and the variance assuming iid
+    plot_pmf_with_normals(
         numbers_range,
-        ccdf,
-        title=f"{problem} CCDF for N={N}, $S_{m}$={shard_sizes}",
-        xlabel="k",
+        pmf,
+        x_continuous,
+        mu_analytical,
+        sigma_analytical,
+        mu_approx,
+        sd_assume_iid,
+        xlabel=f"{label}",
+        title=f"PMF for N={N},$S_{m}$={shard_sizes}, compare with iid normal approximation",
     )
+
+    print(
+        f"Error between the approximated variance and the variance assuming iid: MAE = {mae_var:.5f}, SSE = {sse_var:.5f}"
+    )
+
+    # Plot the complementary cumulative distribution function and the cumulative distribution function
+    # cdf = np.cumsum(pmf)
+    # ccdf = np.cumsum(pmf[::-1])[::-1]
+    # plot_line_graph(
+    #     numbers_range,
+    #     ccdf,
+    #     title=f"{problem} CCDF for N={N}, $S_{m}$={shard_sizes}",
+    #     xlabel="k",
+    # )
     # plot_line_graph(
     #     numbers_range,
     #     cdf,

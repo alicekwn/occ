@@ -25,12 +25,17 @@ def test_approx(total_number, shard_sizes):
     jaccard = AnalyticalJaccard(total_number, shard_sizes, biv)
     approx_result = ApproximatedResult(total_number, shard_sizes)
 
+    p_union_approx = approx_result.union_p_approx()
+    p_intersection_approx = approx_result.intersection_p_approx()
+
     # For union distribution, test mean, variance
-    assert approx_result.union_mu_approx() == pytest.approx(univ.union_mu(), abs=0.01)
+    assert approx_result.mu_sum_indicators(p_union_approx) == pytest.approx(
+        univ.union_mu(), abs=0.01
+    )
     assert approx_result.union_var_approx() == pytest.approx(univ.union_var(), abs=0.01)
 
     # For intersection distribution, test mean, variance
-    assert approx_result.intersection_mu_approx() == pytest.approx(
+    assert approx_result.mu_sum_indicators(p_intersection_approx) == pytest.approx(
         univ.intersection_mu(), abs=0.01
     )
     assert approx_result.intersection_var_approx() == pytest.approx(

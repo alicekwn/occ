@@ -10,14 +10,7 @@ from typing import Iterable
 
 class ApproximatedResult:
     """
-    Approximated results for the union and intersection distributions using CLT.
-
-    Args:
-        total_number: The total number of elements.
-        shard_sizes: The sizes of the shards.
-
-    Returns:
-        Approximated results for the univariate and bivariate distributions using CLT.
+    Approximated results for the union, intersection, bivariate, and jaccard index distributions using CLT.
     """
 
     def __init__(self, total_number: int, shard_sizes: list[int]):
@@ -26,17 +19,30 @@ class ApproximatedResult:
         self.party_number = len(shard_sizes)
         self.alpha = np.array(shard_sizes) / self.total_number
 
+    def mu_sum_indicators(self, probability: float) -> float:
+        """
+        X = sum of indicator random variables, each with probability of getting selected as p.
+        E[X] = sum of E[I_i] = sum of p = total_number * p
+        """
+        return self.total_number * probability
+
+    def var_individuals(self, probability: float) -> float:
+        """
+        Var(X) = sum of Var(I_i) = sum of p * (1 - p) = total_number * p * (1 - p)
+        """
+        return self.total_number * probability * (1 - probability)
+
     # --- Set Union approximated results ---
 
     def union_p_approx(self) -> float:
         return 1 - np.prod(1 - self.alpha)
 
-    def union_mu_approx(self) -> float:
-        return self.total_number * self.union_p_approx()
-
     def union_var_approx(self) -> float:
+        """
+        Variance of individuals + covariance
+        """
         p_union = self.union_p_approx()
-        return self.total_number * p_union * (1 - p_union) + self.total_number * (
+        return self.var_individuals(p_union) + self.total_number * (
             self.total_number - 1
         ) * (
             -np.prod(1 - self.alpha) ** 2
@@ -73,14 +79,14 @@ class ApproximatedResult:
     def intersection_p_approx(self) -> float:
         return np.prod(self.alpha)
 
-    def intersection_mu_approx(self) -> float:
-        return self.total_number * self.intersection_p_approx()
-
     def intersection_var_approx(self) -> float:
+        """
+        Variance of individuals + covariance
+        """
         p_intersect = self.intersection_p_approx()
-        return self.total_number * p_intersect * (
-            1 - p_intersect
-        ) + self.total_number * (self.total_number - 1) * (
+        return self.var_individuals(p_intersect) + self.total_number * (
+            self.total_number - 1
+        ) * (
             np.prod(
                 self.alpha**2 + (self.alpha**2 - self.alpha) / (self.total_number - 1)
             )
@@ -101,9 +107,20 @@ class ApproximatedResult:
 
     # --- Bivariate approximated results ---
     def bivariate_mu_approx(self) -> np.ndarray:
-        return np.array([self.union_mu_approx(), self.intersection_mu_approx()])
+        """
+        Output the mean matrix.
+        """
+        return np.array(
+            [
+                self.mu_sum_indicators(self.union_p_approx()),
+                self.mu_sum_indicators(self.intersection_p_approx()),
+            ]
+        )
 
     def bivariate_cov_approx(self) -> float:
+        """
+        Covariance between the union and intersection distributions.
+        """
         a = self.total_number * self.intersection_p_approx()
         b = (
             self.total_number
@@ -123,6 +140,9 @@ class ApproximatedResult:
         return a + b - c
 
     def bivariate_matrix_approx(self) -> np.ndarray:
+        """
+        Output the covariance matrix.
+        """
         return np.array(
             [
                 [self.union_var_approx(), self.bivariate_cov_approx()],
@@ -131,8 +151,11 @@ class ApproximatedResult:
         )
 
     def bivariate_corr_approx(self) -> float:
+        """
+        Correlation between the union and intersection distributions, which is calculated as the covariance divided by the product of the standard deviations of the union and intersection distributions.
+        """
         return self.bivariate_cov_approx() / (
-            self.union_sd_approx() * self.intersection_sd_approx()
+            np.sqrt(self.union_var_approx()) * np.sqrt(self.intersection_var_approx())
         )
 
     # --- Jaccard index approximated results ---
@@ -145,7 +168,7 @@ class ApproximatedResult:
         )
         second_delta = (
             j * self.union_var_approx() - self.bivariate_cov_approx()
-        ) / self.union_mu_approx() ** 2
+        ) / self.mu_sum_indicators(self.union_p_approx()) ** 2
         return j + second_delta
 
     def jaccard_var_approx(self) -> float:
@@ -159,7 +182,7 @@ class ApproximatedResult:
             + j**2 * self.union_var_approx()
             - 2 * j * self.bivariate_cov_approx()
         )
-        b = self.union_mu_approx() ** 2
+        b = self.mu_sum_indicators(self.union_p_approx()) ** 2
         return a / b
 
     def jaccard_mu_approx_simplified(self) -> float:
@@ -169,38 +192,26 @@ class ApproximatedResult:
             else 0
         )
 
-    # --- Independent approximated results ---
-    def var(self, probability: float) -> float:
-        return self.total_number * probability * (1 - probability)
-
-
-# class IndependentApproximation:
-#     """
-#     Assuming the distributions are independent, calculate the mean and variance of the union and intersection distributions.
-
-#     Args:
-#         total_number: The total number of elements.
-#         shard_sizes: The sizes of the shards.
-
-#     Returns:
-#         Mean and variance of the union and intersection distributions.
-#     """
-
-#     def __init__(self, total_number: int, shard_sizes: list[int]):
-#         self.total_number = total_number
-#         self.shard_sizes = shard_sizes
-#         self.party_number = len(shard_sizes)
-#         self.alpha = np.array(shard_sizes) / self.total_number
-
 
 if __name__ == "__main__":
-    ar = ApproximatedResult(200, [150, 140, 160])
-    print(ar.intersection_p_approx())
-    print(ar.union_p_approx())
-    print(ar.bivariate_cov_approx())
-    print(ar.bivariate_corr_approx())
-    print(ar.bivariate_mu_approx())
-    print(ar.bivariate_matrix_approx())
-    print(ar.jaccard_mu_approx())
-    print(ar.jaccard_var_approx())
-    print(ar.jaccard_mu_approx_simplified())
+    ar = ApproximatedResult(2000, [1800, 1900, 1800, 1800])
+    # --- Univariate approximated results ---
+    print("probability (intersection):", ar.intersection_p_approx())
+    print("probability (union):", ar.union_p_approx())
+    print("mean (union):", ar.mu_sum_indicators(ar.union_p_approx()))
+    print("variance (union):", ar.union_var_approx())
+    print("variance (iid union):", ar.var_individuals(ar.union_p_approx()))
+    print("mean (intersection):", ar.mu_sum_indicators(ar.intersection_p_approx()))
+    print("variance (intersection):", ar.intersection_var_approx())
+    print(
+        "variance (iid intersection):", ar.var_individuals(ar.intersection_p_approx())
+    )
+
+    # --- Bivariate approximated results ---
+    print("covariance (bivariate):", ar.bivariate_cov_approx())
+    print("correlation (bivariate):", ar.bivariate_corr_approx())
+    print("mean (bivariate):", ar.bivariate_mu_approx())
+    print("matrix (bivariate):", ar.bivariate_matrix_approx())
+    print("mean (jaccard):", ar.jaccard_mu_approx())
+    print("variance (jaccard):", ar.jaccard_var_approx())
+    print("mean (jaccard simplified):", ar.jaccard_mu_approx_simplified())

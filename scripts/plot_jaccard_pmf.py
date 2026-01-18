@@ -14,7 +14,10 @@ from occenv.utils import (
     sse_calculation,
     discretize_normal_pmf,
 )
-from occenv.plotting_2d import plot_hist_with_normal, plot_stem_pmf
+from occenv.plotting_2d import (
+    plot_hist_with_normal,
+    # plot_stem_pmf,
+)
 from occenv.constants import FIGURE_DIR
 
 N = 100

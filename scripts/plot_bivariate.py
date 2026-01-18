@@ -1,14 +1,13 @@
 from occenv.analytical_bivariate import AnalyticalBivariate
-from occenv.constants import FIGURE_DIR
 from occenv.plotting_3d import (
     plot_heatmap_ellipse,
-    plot_surface_3d,
-    plot_surface_plotly,
+    # plot_surface_3d,
+    # plot_surface_plotly,
 )
 from occenv.utils_bivariate import Gaussian2D
 
 N = 100
-shard_sizes = (90, 90, 90)
+shard_sizes = (30, 30, 40)
 
 # Build grid (U, V, Z) from the analytical model
 ar = AnalyticalBivariate(total_number=N, shard_sizes=shard_sizes)
@@ -26,6 +25,7 @@ plot_heatmap_ellipse(
     Sigma,
     color_map="hot_r",
     title=f"Bivariate distribution for N={N}, sizes={shard_sizes}",
+    outpath=None,
 )
 
 ## Plot 3D surface
