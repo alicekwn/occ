@@ -2,12 +2,8 @@
 Test that the simulated univariate probabilities match the analytical univariate probabilities.
 """
 
-"""
-Test that simulated union/intersection PMFs and means match analytical results.
-"""
-
-import pytest
 from collections import Counter
+import pytest
 from occenv.simulate import Simulate
 from occenv.analytical_univariate import AnalyticalUnivariate
 from occenv.utils import mu_calculation, var_calculation
