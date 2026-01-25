@@ -1,12 +1,16 @@
-from occenv.analytical_bivariate import AnalyticalBivariate
+from occenv.comb_bivariate import CombinatorialBivariate
 from math import gcd
 import math
 import itertools
 
 
-class AnalyticalJaccard:
+class CombinatorialJaccard:
+    """
+    Jaccard index using combinatorial counting methods and recursive functions.
+    """
+
     def __init__(
-        self, total_number: int, shard_sizes: tuple[int], ar: AnalyticalBivariate
+        self, total_number: int, shard_sizes: tuple[int], ar: CombinatorialBivariate
     ):
         self.total_number = total_number
         self.shard_sizes = shard_sizes

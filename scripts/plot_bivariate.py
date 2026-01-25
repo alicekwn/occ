@@ -1,4 +1,4 @@
-from occenv.analytical_bivariate import AnalyticalBivariate
+from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.plotting_3d import (
     plot_heatmap_ellipse,
     # plot_surface_3d,
@@ -9,11 +9,11 @@ from occenv.utils_bivariate import Gaussian2D
 N = 100
 shard_sizes = (30, 30, 40)
 
-# Build grid (U, V, Z) from the analytical model
-ar = AnalyticalBivariate(total_number=N, shard_sizes=shard_sizes)
-U_vals, V_vals, Z_vals = ar.bivariate_grid()
-mu = ar.bivariate_mu()
-Sigma = ar.bivariate_matrix()
+# Build grid (U, V, Z) from the combinatorial model
+comb_biv = CombinatorialBivariate(total_number=N, shard_sizes=shard_sizes)
+U_vals, V_vals, Z_vals = comb_biv.bivariate_grid()
+mu = comb_biv.bivariate_mu()
+Sigma = comb_biv.bivariate_matrix()
 
 
 # Plot 2D heatmap + ellipses overlays indicating confidence levels

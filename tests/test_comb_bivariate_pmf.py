@@ -1,10 +1,10 @@
 """
-Test that the bivariate event probability matches the analytical bivariate probability.
+Test that the simulated bivariate event probability matches the combinatorial bivariate probability.
 """
 
 import pytest
 from occenv.simulate import Simulate
-from occenv.analytical_bivariate import AnalyticalBivariate
+from occenv.comb_bivariate import CombinatorialBivariate
 
 
 @pytest.mark.parametrize(
@@ -19,21 +19,21 @@ from occenv.analytical_bivariate import AnalyticalBivariate
 def test_bivariate_event_probability(shard_sizes, target_uv):
     """
     Test that the simulated bivariate event (|U|=u and |V|=v) probability
-    matches the analytical bivariate event probability.
+    matches the combinatorial bivariate event probability.
     """
     total_number = 100
     repeats = int(1e6)
 
     sim = Simulate(total_number, shard_sizes)
     degree_counts = sim.simulate_degree_count_repeat(repeat=repeats)
-    pmf = sim.simulate_bivariate_from_degree_counts(degree_counts)
+    pmf = sim.simulate_bivariate(degree_counts)
 
-    # Empirical results
-    p_emp = pmf.get(target_uv, 0.0)
+    # Simulated results
+    p_sim = pmf.get(target_uv, 0.0)
 
-    # Analytical results
-    p_analytical = AnalyticalBivariate(total_number, shard_sizes).bivariate_prob(
+    # Combinatorial results
+    p_comb = CombinatorialBivariate(total_number, shard_sizes).bivariate_prob(
         target_uv[0], target_uv[1]
     )
 
-    assert p_analytical == pytest.approx(p_emp, abs=0.01)
+    assert p_comb == pytest.approx(p_sim, abs=0.01)

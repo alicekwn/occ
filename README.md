@@ -94,8 +94,8 @@ python scripts/plot_jaccard_pmf.py
 
 ## Run tests
 
-### Monte Carlo simulation VS analytical results 
-Note that the 'analytical result' is the recursion equations derived using combinatorics.
+### Monte Carlo simulation VS combinatorial results 
+Note that the combinatorial result is the recursion equations derived using combinatorics.
 
 Test for the 3 distributions:
 1. univariate 
@@ -103,16 +103,16 @@ Test for the 3 distributions:
 3. jaccard index 
 
 ```
-pytest tests/test_univariate_prob.py tests/test_bivariate_prob.py tests/test_jaccard.py
+pytest tests/test_comb_univariate_pmf.py tests/test_comb_bivariate_pmf.py tests/test_comb_jaccard_pmf.py
 ```
 
-### Analytical results sanity check
+### Combinatorial results sanity check
 Test whether the marginal probabilities of bivariate distribution adds up
 ```
-pytest tests/test_marginal.py
+pytest tests/test_comb_bivariate_marginal.py
 ```
 
-### Analytical result VS Approximated result (using CLT)
+### Combinatorial result VS Approximated result (using CLT)
 Test whether the mean and variance match:
 ```
 pytest tests/test_clt_mean_var.py

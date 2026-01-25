@@ -2,12 +2,12 @@
 This script plots the heatmap of results when there are 2 parties.
 """
 
-from occenv.analytical_univariate import AnalyticalUnivariate
-from occenv.analytical_bivariate import AnalyticalBivariate
-from occenv.analytical_jaccard import AnalyticalJaccard
-from occenv.approximated import ApproximatedResult
-from occenv.plotting_3d import plot_heatmap
 import numpy as np
+from occenv.comb_univariate import CombinatorialUnivariate
+from occenv.comb_bivariate import CombinatorialBivariate
+from occenv.comb_jaccard import CombinatorialJaccard
+from occenv.approximated import CltApproxResult
+from occenv.plotting_3d import plot_heatmap
 
 N = 50
 n_vals = np.arange(1, N)
@@ -17,48 +17,44 @@ plot_dict = {
     "collusion_prob": {
         "title": f"Full coverage probability when $N={N},m=2$",
         "z": np.vectorize(
-            lambda n1, n2: AnalyticalUnivariate(N, (n1, n2)).union_prob(N)
+            lambda n1, n2: CombinatorialUnivariate(N, (n1, n2)).union_prob(N)
         )(x, y),
     },
     "sigma": {
         "title": f"$\sigma$ with $N={N},m=2$",
-        "z": np.vectorize(lambda n1, n2: ApproximatedResult(N, (n1, n2)).sigma_value())(
+        "z": np.vectorize(lambda n1, n2: CltApproxResult(N, (n1, n2)).sigma_value())(
             x, y
         ),
     },
     "occ": {
         "title": f"OCC with $N={N},m=2$",
-        "z": np.vectorize(lambda n1, n2: ApproximatedResult(N, (n1, n2)).occ_value())(
+        "z": np.vectorize(lambda n1, n2: CltApproxResult(N, (n1, n2)).occ_value())(
             x, y
         ),
     },
     "expected_jaccard": {
         "title": f"Expected Jaccard index with $N={N}$",
         "z": np.vectorize(
-            lambda n1, n2: AnalyticalJaccard(
-                N, (n1, n2), AnalyticalBivariate(N, (n1, n2))
+            lambda n1, n2: CombinatorialJaccard(
+                N, (n1, n2), CombinatorialBivariate(N, (n1, n2))
             ).jaccard_mu()
         )(x, y),
     },
     "estimated_jaccard": {
         "title": f"Estimated Jaccard index with $N={N}$",
         "z": np.vectorize(
-            lambda n1, n2: ApproximatedResult(
-                N, (n1, n2)
-            ).jaccard_mu_approx_simplified()
+            lambda n1, n2: CltApproxResult(N, (n1, n2)).jaccard_mu_approx_simplified()
         )(x, y),
     },
     "jaccard_difference": {
         "title": f"Difference between Expected and Estimated Jaccard index with $N={N}$",
         "z": np.vectorize(
-            lambda n1, n2: AnalyticalJaccard(
-                N, (n1, n2), AnalyticalBivariate(N, (n1, n2))
+            lambda n1, n2: CombinatorialJaccard(
+                N, (n1, n2), CombinatorialBivariate(N, (n1, n2))
             ).jaccard_mu()
         )(x, y)
         - np.vectorize(
-            lambda n1, n2: ApproximatedResult(
-                N, (n1, n2)
-            ).jaccard_mu_approx_simplified()
+            lambda n1, n2: CltApproxResult(N, (n1, n2)).jaccard_mu_approx_simplified()
         )(x, y),
         "vmax": 0.05,
     },

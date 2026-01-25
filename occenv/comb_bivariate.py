@@ -1,16 +1,25 @@
+"""
+Combinatorial counting methods and recursive functions
+for the bivariate distribution (union, intersection).
+"""
+
+import itertools
 from math import comb, prod, ceil
 from functools import lru_cache
 import numpy as np
-import itertools
 
 
-class AnalyticalBivariate:
+class CombinatorialBivariate:
+    """
+    Bivariate distributions using combinatorial counting methods and recursive functions.
+    """
+
     def __init__(self, total_number: int, shard_sizes: list[int]):
         self.total_number = total_number
         self.shard_sizes = shard_sizes
         self.party_number = len(shard_sizes)
 
-    # ---- Analytical result for bivariate pmf ----
+    # ---- Combinatorial result for bivariate pmf ----
     def bivariate_cases(self, number_covered: int, number_intersect: int) -> int:
         """
         Exact count of ordered m-tuples with |⋃P_i|=u and |⋂P_i|=v.
@@ -89,11 +98,17 @@ class AnalyticalBivariate:
         )
 
     def bivariate_prob(self, number_covered: int, number_intersect: int) -> float:
+        """
+        Probability that the union of the parties equals number_covered and the intersection of the parties equals number_intersect.
+        """
         return self.bivariate_cases(number_covered, number_intersect) / prod(
             comb(self.total_number, n) for n in self.shard_sizes
         )
 
     def bivariate_mu(self) -> np.ndarray:
+        """
+        Mean vector of the bivariate distribution.
+        """
         U = range(0, self.total_number + 1)
         V = range(0, min(self.shard_sizes) + 1)
 
@@ -102,6 +117,9 @@ class AnalyticalBivariate:
         return np.array([EU, EV])
 
     def bivariate_var(self) -> np.ndarray:
+        """
+        Variance vector of the bivariate distribution.
+        """
         U = range(max(self.shard_sizes), self.total_number + 1)
         V = range(0, min(self.shard_sizes) + 1)
 
@@ -116,6 +134,9 @@ class AnalyticalBivariate:
         return np.array([EU2 - EU * EU, EV2 - EV * EV])
 
     def bivariate_cov(self) -> float:
+        """
+        Covariance between the union and intersection distributions.
+        """
         U = range(0, self.total_number + 1)
         V = range(0, min(self.shard_sizes) + 1)
 
@@ -125,6 +146,9 @@ class AnalyticalBivariate:
         return EUV - EU * EV
 
     def bivariate_matrix(self) -> np.ndarray:
+        """
+        Covariance matrix of the bivariate distribution.
+        """
         return np.array(
             [
                 [self.bivariate_var()[0], self.bivariate_cov()],
@@ -134,7 +158,7 @@ class AnalyticalBivariate:
 
     def bivariate_grid(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Build the grid (U, V, Z) from the analytical model.
+        Build the grid (U, V, Z) from the Combinatorial model.
         """
         m, S = len(self.shard_sizes), sum(self.shard_sizes)
         nmax, nmin = max(self.shard_sizes), min(self.shard_sizes)
@@ -156,6 +180,6 @@ class AnalyticalBivariate:
 
 
 if __name__ == "__main__":
-    ana = AnalyticalBivariate(200, [150, 140, 160])
+    ana = CombinatorialBivariate(200, [150, 140, 160])
     print(ana.bivariate_mu())
     print(ana.bivariate_matrix())

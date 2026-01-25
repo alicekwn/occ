@@ -4,9 +4,9 @@ It also calculates the MAE and SSE of the empirical PMF and the approximated nor
 """
 
 from fractions import Fraction
-from occenv.analytical_bivariate import AnalyticalBivariate
-from occenv.analytical_jaccard import AnalyticalJaccard
-from occenv.approximated import ApproximatedResult
+from occenv.comb_bivariate import CombinatorialBivariate
+from occenv.comb_jaccard import CombinatorialJaccard
+from occenv.approximated import CltApproxResult
 from occenv.utils import (
     mu_calculation,
     sd_calculation,
@@ -24,8 +24,9 @@ N = 100
 alpha = (0.3, 0.4, 0.5)
 m = len(alpha)
 shard_sizes = tuple(int(N * a) for a in alpha)
-ar = AnalyticalBivariate(N, shard_sizes)
-analytical = AnalyticalJaccard(N, shard_sizes, ar)
+comb_biv = CombinatorialBivariate(N, shard_sizes)
+comb_jaccard = CombinatorialJaccard(N, shard_sizes, comb_biv)
+clt_approx = CltApproxResult(N, shard_sizes)
 
 # --- Build Jaccard index PMF ---
 ratios = set()
@@ -36,7 +37,7 @@ ratios = sorted(ratios, key=float)
 
 jaccard_list, prob_jaccard_list = [], []
 for ratio in ratios:
-    prob_jaccard = analytical.jaccard_prob(ratio.numerator, ratio.denominator)
+    prob_jaccard = comb_jaccard.jaccard_prob(ratio.numerator, ratio.denominator)
     if prob_jaccard > 0:
         jaccard_list.append(float(ratio))
         prob_jaccard_list.append(prob_jaccard)
@@ -44,8 +45,8 @@ for ratio in ratios:
 # --- Calculate the mean, std of the distribution and approximated expected Jaccard index ---
 mu = mu_calculation(jaccard_list, prob_jaccard_list)
 sd = sd_calculation(jaccard_list, prob_jaccard_list)
-jaccard_mu_approx = ApproximatedResult(N, shard_sizes).jaccard_mu_approx()
-jaccard_sd_approx = ApproximatedResult(N, shard_sizes).jaccard_var_approx() ** 0.5
+jaccard_mu_approx = clt_approx.jaccard_mu_approx()
+jaccard_sd_approx = CltApproxResult(N, shard_sizes).jaccard_var_approx() ** 0.5
 print(f"jaccard_mu: {mu}, jaccard_sd: {sd}")
 print(f"jaccard_mu_approx: {jaccard_mu_approx}, jaccard_sd_approx: {jaccard_sd_approx}")
 

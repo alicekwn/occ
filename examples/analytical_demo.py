@@ -1,19 +1,19 @@
 """
-This script is used to demonstrate the analytical results of the occenv.analytical.AnalyticalResult class.
+This script demonstrates the calculation of the combinatorial results.
 """
 
-from occenv.analytical_univariate import AnalyticalUnivariate
-from occenv.analytical_bivariate import AnalyticalBivariate
-from occenv.analytical_jaccard import AnalyticalJaccard
-from occenv.approximated import ApproximatedResult
+from occenv.comb_univariate import CombinatorialUnivariate
+from occenv.comb_bivariate import CombinatorialBivariate
+from occenv.comb_jaccard import CombinatorialJaccard
+from occenv.approximated import CltApproxResult
 
 N = 10
 shard_sizes = (7, 9)
 print(f"The total number is {N} and the shard sizes are {shard_sizes}")
-compute_univariate = AnalyticalUnivariate(N, shard_sizes)
-compute_bivariate = AnalyticalBivariate(N, shard_sizes)
-compute_jaccard = AnalyticalJaccard(N, shard_sizes, compute_bivariate)
-compute_approximated = ApproximatedResult(N, shard_sizes)
+compute_univariate = CombinatorialUnivariate(N, shard_sizes)
+compute_bivariate = CombinatorialBivariate(N, shard_sizes)
+compute_jaccard = CombinatorialJaccard(N, shard_sizes, compute_bivariate)
+compute_approximated = CltApproxResult(N, shard_sizes)
 
 # Calculate union and intersect probability
 collusion_probability = compute_univariate.union_prob(N)

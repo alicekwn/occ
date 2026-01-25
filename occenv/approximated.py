@@ -8,7 +8,7 @@ from math import prod
 from typing import Iterable
 
 
-class ApproximatedResult:
+class CltApproxResult:
     """
     Approximated results for the union, intersection, bivariate, and jaccard index distributions using CLT.
     """
@@ -194,7 +194,7 @@ class ApproximatedResult:
 
 
 if __name__ == "__main__":
-    ar = ApproximatedResult(2000, [1800, 1900, 1800, 1800])
+    ar = CltApproxResult(2000, [1800, 1900, 1800, 1800])
     # --- Univariate approximated results ---
     print("probability (intersection):", ar.intersection_p_approx())
     print("probability (union):", ar.union_p_approx())

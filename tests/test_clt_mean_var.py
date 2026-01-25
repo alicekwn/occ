@@ -4,10 +4,10 @@ Testing whether the mean and variance matches.
 """
 
 import pytest
-from occenv.approximated import ApproximatedResult
-from occenv.analytical_univariate import AnalyticalUnivariate
-from occenv.analytical_bivariate import AnalyticalBivariate
-from occenv.analytical_jaccard import AnalyticalJaccard
+from occenv.approximated import CltApproxResult
+from occenv.comb_univariate import CombinatorialUnivariate
+from occenv.comb_bivariate import CombinatorialBivariate
+from occenv.comb_jaccard import CombinatorialJaccard
 
 
 @pytest.mark.parametrize(
@@ -25,10 +25,10 @@ def test_approx(total_number, shard_sizes):
     """
     Test that the (CLT) approximated mean and variance match the analytical mean and variance.
     """
-    univ = AnalyticalUnivariate(total_number, shard_sizes)
-    biv = AnalyticalBivariate(total_number, shard_sizes)
-    jaccard = AnalyticalJaccard(total_number, shard_sizes, biv)
-    approx_result = ApproximatedResult(total_number, shard_sizes)
+    univ = CombinatorialUnivariate(total_number, shard_sizes)
+    biv = CombinatorialBivariate(total_number, shard_sizes)
+    jaccard = CombinatorialJaccard(total_number, shard_sizes, biv)
+    approx_result = CltApproxResult(total_number, shard_sizes)
 
     # ----- Union distribution -------
     p_union_approx = approx_result.union_p_approx()

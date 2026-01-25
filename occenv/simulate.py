@@ -48,7 +48,7 @@ class Simulate:
         )  # the output is a list of lists, each list is the degree counts of a single run
         return degrees_lists
 
-    def simulate_bivariate_from_degree_counts(
+    def simulate_bivariate(
         self, degree_counts_array: np.ndarray
     ) -> dict[tuple[int, int], float]:
         """
@@ -90,7 +90,5 @@ if __name__ == "__main__":
         sum(repeat_degree_counts[:, len(n)]) / REPEATS,
     )
 
-    bivariate_pmf = simulator.simulate_bivariate_from_degree_counts(
-        repeat_degree_counts
-    )
+    bivariate_pmf = simulator.simulate_bivariate(repeat_degree_counts)
     print(bivariate_pmf)

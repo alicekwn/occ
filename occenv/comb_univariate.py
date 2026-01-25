@@ -1,15 +1,24 @@
+"""
+Combinatorial counting methods and recursive functions for the univariate distributions.
+For union and intersection distributions.
+"""
+
 from math import comb, prod
 import numpy as np
 from occenv.utils import mu_calculation, var_calculation
 
 
-class AnalyticalUnivariate:
+class CombinatorialUnivariate:
+    """
+    Univariate distributions using combinatorial counting methods and recursive functions.
+    """
+
     def __init__(self, total_number: int, shard_sizes: tuple[int]):
         self.total_number = total_number
         self.shard_sizes = shard_sizes
         self.party_number = len(shard_sizes)
 
-    # ---- Analytical result for union pmf ----
+    # ---- Combinatorial result for union pmf ----
     def union_cases(self, number_covered) -> int:
         """
         Calculate the number of cases when the union of the shards have size number_covered.
@@ -55,7 +64,7 @@ class AnalyticalUnivariate:
             [self.union_prob(u) for u in range(self.total_number + 1)],
         )
 
-    # ---- Analytical result for intersect pmf ----
+    # ---- Combinatorial result for intersect pmf ----
     def intersect_cases(self, overall_intersect: int) -> float:
         """
         Calculate the number of cases when the intersection of the shards have size intersect.
