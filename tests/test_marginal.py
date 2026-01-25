@@ -1,12 +1,12 @@
 """
-Test that the marginal probabilities of the bivariate distribution match the univariate probabilities.
+Test whether the marginal probabilities of bivariate distribution match univariate probabilities.
 (Purely analytical identity checks, no simulation involved)
 """
 
+import random
 import pytest
 from occenv.analytical_bivariate import AnalyticalBivariate
 from occenv.analytical_univariate import AnalyticalUnivariate
-import random
 
 
 @pytest.mark.parametrize(

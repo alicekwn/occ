@@ -95,6 +95,8 @@ python scripts/plot_jaccard_pmf.py
 ## Run tests
 
 ### Monte Carlo simulation VS analytical results 
+Note that the 'analytical result' is the recursion equations derived using combinatorics.
+
 Test for the 3 distributions:
 1. univariate 
 2. bivariate 
@@ -111,8 +113,20 @@ pytest tests/test_marginal.py
 ```
 
 ### Analytical result VS Approximated result (using CLT)
+Test whether the mean and variance match:
 ```
-pytest tests/test_approx.py
+pytest tests/test_clt_mean_var.py
 ```
+Result: test passed, even at edge cases
+
+Test whether the pmf match (after discretising the CLT normal distribution):
+```
+pytest tests/test_clt_pmf.py
+``` 
+Result: test failed when at least one shard is too small or too big relative to the total number (edge). 
 
 
+### Analytical result VS Approximated result ("Moment-Matched" Binomial)
+Test whether the mean and variance match:
+
+Test whether the pmf match:

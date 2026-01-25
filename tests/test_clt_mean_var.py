@@ -1,5 +1,6 @@
 """
-Test the approximated results vs analytical results
+Test the CLT approximated results vs analytical (combinatorial) results.
+Testing whether the mean and variance matches.
 """
 
 import pytest
@@ -14,27 +15,31 @@ from occenv.analytical_jaccard import AnalyticalJaccard
     [
         (100, (10, 20, 30)),
         (100, (10, 20, 30, 40)),
-        (100, (40, 50)),
+        (100, (50, 50)),
         (200, (100, 100, 100)),
+        (200, (10, 10, 8, 5)),  # edge case
+        (200, (190, 180, 195, 199)),  # edge case
     ],
 )
 def test_approx(total_number, shard_sizes):
-
+    """
+    Test that the (CLT) approximated mean and variance match the analytical mean and variance.
+    """
     univ = AnalyticalUnivariate(total_number, shard_sizes)
     biv = AnalyticalBivariate(total_number, shard_sizes)
     jaccard = AnalyticalJaccard(total_number, shard_sizes, biv)
     approx_result = ApproximatedResult(total_number, shard_sizes)
 
+    # ----- Union distribution -------
     p_union_approx = approx_result.union_p_approx()
-    p_intersection_approx = approx_result.intersection_p_approx()
 
-    # For union distribution, test mean, variance
     assert approx_result.mu_sum_indicators(p_union_approx) == pytest.approx(
         univ.union_mu(), abs=0.01
     )
     assert approx_result.union_var_approx() == pytest.approx(univ.union_var(), abs=0.01)
 
-    # For intersection distribution, test mean, variance
+    # ----- Intersection distribution -------
+    p_intersection_approx = approx_result.intersection_p_approx()
     assert approx_result.mu_sum_indicators(p_intersection_approx) == pytest.approx(
         univ.intersection_mu(), abs=0.01
     )
@@ -42,7 +47,7 @@ def test_approx(total_number, shard_sizes):
         univ.intersection_var(), abs=0.01
     )
 
-    # For bivariate distribution, test mean vector, and variance matrix
+    # ----- Bivariate distribution -------
     assert approx_result.bivariate_mu_approx() == pytest.approx(
         biv.bivariate_mu(), abs=0.01
     )
@@ -50,7 +55,7 @@ def test_approx(total_number, shard_sizes):
         biv.bivariate_matrix(), abs=0.01
     )
 
-    # For jaccard index, test mean, variance
+    # ----- Jaccard index distribution -------
     assert approx_result.jaccard_mu_approx() == pytest.approx(
         jaccard.jaccard_mu(), abs=0.01
     )
