@@ -1,113 +1,96 @@
-from joblib import Parallel, delayed
-from occenv.env import DataShare
+"""
+Monte Carlo simulation of the degree distribution of the data share.
+"""
+
 from collections import Counter
 import numpy as np
+from joblib import Parallel, delayed
+from occenv.env import DataShare
 
 
 class Simulate:
+    """
+    Simulate the shards of the data, and calculate
+    (1) the whole degree distribution
+    (2) the bivariate distribution of (U, V) (which can be calculated from the degree distribution)
+    (3) the union and intersection sizes (which can be calculated from the degree distribution)
+    """
+
     def __init__(self, total_number: int, shard_sizes: list[int]):
         self.total_number = total_number
         self.shard_sizes = shard_sizes
         self.m = len(shard_sizes)
 
-    def _simulate_level_count_once(self) -> list[int]:
+    def _simulate_degree_count_once(self) -> list[int]:
         """
-        Single run → level counts of the data share.
+        Single run → all degree counts of the data share.
         """
         new_mpc = DataShare(self.total_number)
         shards = [set(new_mpc.create_shard(s)) for s in self.shard_sizes]
-        level_counts = [0] * (self.m + 1)
+        degree_counts = [0] * (self.m + 1)
         for i in range(self.total_number):
             count = 0
             for shard in shards:
                 if i in shard:
                     count += 1
-            level_counts[count] += 1
-        return level_counts
+            degree_counts[count] += 1
+        return degree_counts
 
-    def simulate_level_count_repeat(self, repeat: int) -> list[int]:
+    def simulate_degree_count_repeat(self, repeat: int) -> list[int]:
         """
-        Repeat the simulation of level counts and return the average level counts for each level.
+        Repeat the simulation of all degree counts
+        and return the lists of all degree counts for each run.
         """
-        levels = np.array(
+        degrees_lists = np.array(
             Parallel(n_jobs=-1)(
-                delayed(self._simulate_level_count_once)() for _ in range(repeat)
+                delayed(self._simulate_degree_count_once)() for _ in range(repeat)
             )
-        )  # the output is a list of lists, each list is the level counts of a single run
-        level_average = [float(round(sum(x) / repeat, 4)) for x in zip(*levels)]
-        return level_average
+        )  # the output is a list of lists, each list is the degree counts of a single run
+        return degrees_lists
 
-    def _simulate_bivariate_once(self) -> tuple[int, int]:
-        """
-        Single run → (U, V) for ALL shards:
-        U = union size, V = intersection size.
-        """
-        if self.m == 0:
-            return (0, 0)
-
-        new_mpc = DataShare(self.total_number)
-        shards = [set(new_mpc.create_shard(s)) for s in self.shard_sizes]
-        U = len(set().union(*shards))
-        V = len(set.intersection(*shards))
-        return U, V
-
-    def simulate_bivariate_repeat(
-        self, repeat: int, block: int = 10_000
+    def simulate_bivariate_from_degree_counts(
+        self, degree_counts_array: np.ndarray
     ) -> dict[tuple[int, int], float]:
         """
-        Bivariate PMF over (U, V): {(U, V): probability}.
-        Runs in blocks to avoid storing all raw samples.
+        Calculate bivariate PMF from degree counts array.
         """
+        repeat = degree_counts_array.shape[0]
+        bivariate_counts = Counter()
 
-        def _run_block(block_number: int) -> Counter:
-            c = Counter()
-            for _ in range(block_number):
-                c[self._simulate_bivariate_once()] += 1
-            return c
+        for degree_counts in degree_counts_array:
+            U = int(self.total_number - degree_counts[0])
+            V = int(degree_counts[self.m])
+            bivariate_counts[(U, V)] += 1
 
-        q, r = divmod(repeat, block)
-        blocks = [block] * q + ([r] if r else [])
-        parts = Parallel(n_jobs=-1)(
-            delayed(_run_block)(block_number) for block_number in blocks
-        )
-
-        total = Counter()
-        for part in parts:
-            total.update(part)
-
-        return {uv: cnt / repeat for uv, cnt in total.items()}
-
-    def _simulate_union_once(self) -> int:
-        U, _ = self._simulate_bivariate_once()
-        return U
-
-    def simulate_union_repeat(self, repeat: int) -> list[int]:
-        return Parallel(n_jobs=-1)(
-            delayed(self._simulate_union_once)() for _ in range(repeat)
-        )
-
-    def _simulate_intersection_once(self) -> int:
-        _, V = self._simulate_bivariate_once()
-        return V
-
-    def simulate_intersection_repeat(self, repeat: int) -> list[int]:
-        return Parallel(n_jobs=-1)(
-            delayed(self._simulate_intersection_once)() for _ in range(repeat)
-        )
+        return {uv: cnt / repeat for uv, cnt in bivariate_counts.items()}
 
 
 if __name__ == "__main__":
     N = 100
-    n = [50, 63, 75]
+    n = [50, 60, 70]
 
     simulator = Simulate(N, n)
-    repeats = int(1e6)
+    REPEATS = int(1e6)
 
-    # union = simulator.simulate_union_repeat(repeats)
-    # print("The average union is ", sum(union) / repeats)
+    repeat_degree_counts = simulator.simulate_degree_count_repeat(REPEATS)
 
-    # intersection = simulator.simulate_intersection_repeat(repeats)
-    # print("The average intersection is ", sum(intersection) / repeats)
+    print(
+        "\n".join(
+            [
+                f"The average degree count for degree = {i} is {sum(repeat_degree_counts[:, i]) / REPEATS}"
+                for i in range(len(n) + 1)
+            ]
+        )
+    )
 
-    repeat_level_counts = simulator.simulate_level_count_repeat(repeats)
-    print("The average level counts are ", repeat_level_counts)
+    print("The average union is ", N - sum(repeat_degree_counts[:, 0]) / REPEATS)
+
+    print(
+        "The average intersection is ",
+        sum(repeat_degree_counts[:, len(n)]) / REPEATS,
+    )
+
+    bivariate_pmf = simulator.simulate_bivariate_from_degree_counts(
+        repeat_degree_counts
+    )
+    print(bivariate_pmf)

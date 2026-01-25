@@ -24,6 +24,10 @@ from occenv.utils import mu_calculation, var_calculation
     ],
 )
 def test_univariate_pmf_and_mean(shard_sizes):
+    """
+    Test that the simulated univariate (union and intersection) probabilities
+    match the analytical univariate probabilities.
+    """
     total_number = 10
     repeats = int(1e6)
 
@@ -31,17 +35,18 @@ def test_univariate_pmf_and_mean(shard_sizes):
     ana = AnalyticalUnivariate(total_number, shard_sizes)
 
     # --- Empirical PMFs from samples ---
-    union_samples = sim.simulate_union_repeat(repeat=repeats)
-    inter_samples = sim.simulate_intersection_repeat(repeat=repeats)
+    degree_counts = sim.simulate_degree_count_repeat(repeat=repeats)
+    union_samples = total_number - degree_counts[:, 0]
+    intersection_samples = degree_counts[:, len(shard_sizes)]
 
-    cU = Counter(union_samples)
-    cV = Counter(inter_samples)
+    count_u = Counter(union_samples)
+    count_v = Counter(intersection_samples)
 
     x_u = list(range(0, total_number + 1))
     x_v = list(range(0, min(shard_sizes) + 1))
 
-    pmf_u_emp = [cU.get(u, 0) / repeats for u in x_u]
-    pmf_v_emp = [cV.get(v, 0) / repeats for v in x_v]
+    pmf_u_emp = [count_u.get(u, 0) / repeats for u in x_u]
+    pmf_v_emp = [count_v.get(v, 0) / repeats for v in x_v]
 
     # --- Analytical PMFs ---
     pmf_u_ana = [ana.union_prob(u) for u in x_u]
@@ -60,13 +65,13 @@ def test_univariate_pmf_and_mean(shard_sizes):
     assert sum(pmf_v_ana) == pytest.approx(1.0, abs=1e-9)
 
     # --- Compare means ---
-    E_union_emp = mu_calculation(x_u, pmf_u_emp)
-    E_union_ana = ana.union_mu()
-    E_inter_emp = mu_calculation(x_v, pmf_v_emp)
-    E_inter_ana = ana.intersection_mu()
+    mean_union_emp = mu_calculation(x_u, pmf_u_emp)
+    mean_union_ana = ana.union_mu()
+    mean_inter_emp = mu_calculation(x_v, pmf_v_emp)
+    mean_inter_ana = ana.intersection_mu()
 
-    assert E_union_ana == pytest.approx(E_union_emp, abs=0.01)
-    assert E_inter_ana == pytest.approx(E_inter_emp, abs=0.01)
+    assert mean_union_ana == pytest.approx(mean_union_emp, abs=0.01)
+    assert mean_inter_ana == pytest.approx(mean_inter_emp, abs=0.01)
 
     # --- Compare variances ---
     var_union_emp = var_calculation(x_u, pmf_u_emp)
