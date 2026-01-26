@@ -127,6 +127,7 @@ Result: test failed when at least one shard is too small or too big relative to 
 
 
 ### Analytical result VS Approximated result ("Moment-Matched" Binomial)
-Test whether the mean and variance match:
-
 Test whether the pmf match:
+```
+pytest tests/test_binom_pmf.py
+```

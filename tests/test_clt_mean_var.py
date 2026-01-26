@@ -4,7 +4,7 @@ Testing whether the mean and variance matches.
 """
 
 import pytest
-from occenv.approximated import CltApproxResult
+from occenv.clt_approx import CltApproxResult
 from occenv.comb_univariate import CombinatorialUnivariate
 from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.comb_jaccard import CombinatorialJaccard

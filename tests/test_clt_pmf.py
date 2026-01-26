@@ -1,12 +1,12 @@
 """
-Test the CLT approximated results vs analytical results.
+Test the CLT approximated results vs combinatorial results.
 Testing whether each element of the PMF matches.
 """
 
 from fractions import Fraction
 import numpy as np
 import pytest
-from occenv.approximated import CltApproxResult
+from occenv.clt_approx import CltApproxResult
 from occenv.comb_univariate import CombinatorialUnivariate
 from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.comb_jaccard import CombinatorialJaccard

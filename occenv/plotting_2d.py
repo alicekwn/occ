@@ -21,7 +21,7 @@ def plot_pmf_with_normals(
     save_path=None,
 ):
     """
-    Plot discrete union PMF with analytical (solid blue) and approximated (dashed red) normal overlays.
+    Plot discrete union PMF with analytical (solid blue) and CLT approximated (dashed red) normal overlays.
     """
     normal = norm.pdf(x_continuous, mu, sigma)
     normal_approx = norm.pdf(x_continuous, mu_approx, sd_approx)
@@ -71,7 +71,7 @@ def plot_hist_with_normal(
     save_path=None,
 ):
     """
-    Histogram for a PMF with analytical (solid blue) and approximated (dashed red) normal overlays
+    Histogram for a PMF with analytical (solid blue) and CLT approximated (dashed red) normal overlays
     """
     plt.figure(figsize=(9, 4))
     plt.hist(
@@ -105,7 +105,7 @@ def plot_hist_with_normal(
         plt.plot(
             x_grid,
             norm_pdf_approx,
-            label=f"approximated normal pdf (μ={mu_approx:.4f}, σ={sigma_approx:.4f})",
+            label=f"CLT approximated normal pdf (μ={mu_approx:.4f}, σ={sigma_approx:.4f})",
             color="r",
             linestyle="--",
         )
