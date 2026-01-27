@@ -5,7 +5,7 @@ This script demonstrates the calculation of the combinatorial results.
 from occenv.comb_univariate import CombinatorialUnivariate
 from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.comb_jaccard import CombinatorialJaccard
-from occenv.approximated import CltApproxResult
+from occenv.clt_approx import CltApproxResult
 
 N = 10
 shard_sizes = (7, 9)
@@ -13,12 +13,12 @@ print(f"The total number is {N} and the shard sizes are {shard_sizes}")
 compute_univariate = CombinatorialUnivariate(N, shard_sizes)
 compute_bivariate = CombinatorialBivariate(N, shard_sizes)
 compute_jaccard = CombinatorialJaccard(N, shard_sizes, compute_bivariate)
-compute_approximated = CltApproxResult(N, shard_sizes)
+compute_clt_approx = CltApproxResult(N, shard_sizes)
 
 # Calculate union and intersect probability
 collusion_probability = compute_univariate.union_prob(N)
-sigma_value = compute_approximated.sigma_value()
-occ_value = compute_approximated.occ_value()
+sigma_value = compute_clt_approx.sigma_value()
+occ_value = compute_clt_approx.occ_value()
 
 print("Expected total union =", N * sigma_value)
 print("Expected total intersection =", N * occ_value)
