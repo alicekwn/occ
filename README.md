@@ -1,9 +1,9 @@
-# A Rapid Estimation of Distributional Statistics in Probabilistic Data Structures, Graph Models, and Cryptography
+# Distributional Statistics of Random Set Models with Fixed Cardinalities
 
 ## Setup
 
 ```
-git clone https://github.com/zcahkwn/occ.git
+git clone https://github.com/alicekwn/occ.git
 cd occ
 ```
 
