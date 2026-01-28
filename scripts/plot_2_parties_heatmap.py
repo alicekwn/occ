@@ -6,7 +6,7 @@ import numpy as np
 from occenv.comb_univariate import CombinatorialUnivariate
 from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.comb_jaccard import CombinatorialJaccard
-from occenv.approximated import CltApproxResult
+from occenv.clt_special_case import CltSpecialCase
 from occenv.plotting_3d import plot_heatmap
 
 N = 50
@@ -22,15 +22,13 @@ plot_dict = {
     },
     "sigma": {
         "title": f"$\sigma$ with $N={N},m=2$",
-        "z": np.vectorize(lambda n1, n2: CltApproxResult(N, (n1, n2)).sigma_value())(
+        "z": np.vectorize(lambda n1, n2: CltSpecialCase(N, (n1, n2)).sigma_value())(
             x, y
         ),
     },
     "occ": {
         "title": f"OCC with $N={N},m=2$",
-        "z": np.vectorize(lambda n1, n2: CltApproxResult(N, (n1, n2)).occ_value())(
-            x, y
-        ),
+        "z": np.vectorize(lambda n1, n2: CltSpecialCase(N, (n1, n2)).occ_value())(x, y),
     },
     "expected_jaccard": {
         "title": f"Expected Jaccard index with $N={N}$",
@@ -43,7 +41,7 @@ plot_dict = {
     "estimated_jaccard": {
         "title": f"Estimated Jaccard index with $N={N}$",
         "z": np.vectorize(
-            lambda n1, n2: CltApproxResult(N, (n1, n2)).jaccard_mu_approx_simplified()
+            lambda n1, n2: CltSpecialCase(N, (n1, n2)).jaccard_mu_approx_simplified()
         )(x, y),
     },
     "jaccard_difference": {
@@ -54,7 +52,7 @@ plot_dict = {
             ).jaccard_mu()
         )(x, y)
         - np.vectorize(
-            lambda n1, n2: CltApproxResult(N, (n1, n2)).jaccard_mu_approx_simplified()
+            lambda n1, n2: CltSpecialCase(N, (n1, n2)).jaccard_mu_approx_simplified()
         )(x, y),
         "vmax": 0.05,
     },

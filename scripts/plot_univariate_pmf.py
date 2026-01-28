@@ -15,19 +15,22 @@ from occenv.utils import (
     norm_pdf,
 )
 from occenv.plotting_2d import plot_pmf_with_normals
-from occenv.approximated import CltApproxResult
+from occenv.clt_special_case import CltSpecialCase
 
-N = 200
-shard_sizes = (15, 14, 16)
+N = 100
+shard_sizes = (10, 10, 10, 10)
 m = len(shard_sizes)
 
 comb = CombinatorialUnivariate(N, shard_sizes)
-clt_approx = CltApproxResult(N, shard_sizes)
+clt_approx = CltSpecialCase(N, shard_sizes)
 
 numbers_range = np.arange(0, N + 1, 1)
 x_continuous = np.linspace(min(numbers_range) - 1, max(numbers_range) + 1, 500)
 
-problems = {"Union": "u", "Intersection": "v"}
+problems = {
+    # "Union": "u",
+    "Intersection": "v"
+}
 
 for problem, label in problems.items():
     # Calculate the PMF for the problem

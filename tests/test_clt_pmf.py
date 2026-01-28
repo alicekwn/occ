@@ -6,7 +6,7 @@ Testing whether each element of the PMF matches.
 from fractions import Fraction
 import numpy as np
 import pytest
-from occenv.clt_approx import CltApproxResult
+from occenv.clt_special_case import CltSpecialCase
 from occenv.comb_univariate import CombinatorialUnivariate
 from occenv.comb_bivariate import CombinatorialBivariate
 from occenv.comb_jaccard import CombinatorialJaccard
@@ -30,7 +30,7 @@ def test_approx(total_number, shard_sizes):
     univ = CombinatorialUnivariate(total_number, shard_sizes)
     biv = CombinatorialBivariate(total_number, shard_sizes)
     jaccard = CombinatorialJaccard(total_number, shard_sizes, biv)
-    approx_result = CltApproxResult(total_number, shard_sizes)
+    approx_result = CltSpecialCase(total_number, shard_sizes)
 
     # ----- Union distribution -------
     p_union_approx = approx_result.union_p_approx()

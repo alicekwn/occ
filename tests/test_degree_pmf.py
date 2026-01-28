@@ -2,10 +2,9 @@
 Test the degree distribution p_d(alpha) against simulation.
 """
 
-import numpy as np
 import pytest
 
-from occenv.clt_approx import CltApproxResult
+from occenv.clt_degree_approx import CltDegreeVector
 from occenv.simulate import Simulate
 
 
@@ -16,7 +15,10 @@ from occenv.simulate import Simulate
     ],
 )
 def test_degree_pmf_matches_simulation(total_number, shard_sizes, d_values, repeats):
-    approx = CltApproxResult(total_number, shard_sizes)
+    """
+    Test that the (CLT) approximated degree distribution matches the simulation.
+    """
+    approx = CltDegreeVector(total_number, shard_sizes)
     sim = Simulate(total_number, shard_sizes)
     counts = sim.simulate_degree_count_repeat(repeats)
 
