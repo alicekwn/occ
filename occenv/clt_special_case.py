@@ -35,6 +35,7 @@ class CltSpecialCase:
     # --- Set Union approximated results ---
 
     def union_p_approx(self) -> float:
+        """p_U used in union distribution"""
         return 1 - np.prod(1 - self.alpha)
 
     def union_var_approx(self) -> float:
@@ -55,11 +56,13 @@ class CltSpecialCase:
         )
 
     def union_sd_approx(self) -> float:
+        """Standard deviation of the union distribution"""
         return np.sqrt(self.union_var_approx())
 
     def sigma_value(
         self,
-    ):  # N * sigma value is the expected total union, using inclusion-exclusion principle
+    ):
+        """N * sigma value is the expected total union, using inclusion-exclusion principle"""
         sigma = 0.0
         for k in range(
             1, self.party_number + 1
@@ -75,6 +78,7 @@ class CltSpecialCase:
     # --- Set Intersect approximated results ---
 
     def intersection_p_approx(self) -> float:
+        """p_I used in intersection distribution"""
         return np.prod(self.alpha)
 
     def intersection_var_approx(self) -> float:
@@ -90,17 +94,15 @@ class CltSpecialCase:
         )
 
     def intersection_sd_approx(self) -> float:
+        """Standard deviation of the intersection distribution"""
         return np.sqrt(self.intersection_var_approx())
 
     def rho(self, indices: Iterable[int]) -> float:
+        """Intersection probability for any given set of indices"""
         product = prod(self.shard_sizes[i] for i in indices)
         k = len(indices)
         result = product / (self.total_number**k)
         return result
-
-    def occ_value(self):
-        """N * OCC value is the expected total intersection"""
-        return self.rho(list(range(self.party_number)))
 
     # --- Bivariate approximated results ---
     def bivariate_mu_approx(self) -> np.ndarray:

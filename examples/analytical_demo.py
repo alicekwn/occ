@@ -18,10 +18,10 @@ compute_clt_approx = CltSpecialCase(N, shard_sizes)
 # Calculate union and intersect probability
 collusion_probability = compute_univariate.union_prob(N)
 sigma_value = compute_clt_approx.sigma_value()
-occ_value = compute_clt_approx.occ_value()
+intersect_probability = compute_clt_approx.intersection_p_approx()
 
 print("Expected total union =", N * sigma_value)
-print("Expected total intersection =", N * occ_value)
+print("Expected total intersection =", N * intersect_probability)
 
 union_test = 7
 intersect_test = 6

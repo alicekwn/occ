@@ -28,7 +28,9 @@ plot_dict = {
     },
     "occ": {
         "title": f"OCC with $N={N},m=2$",
-        "z": np.vectorize(lambda n1, n2: CltSpecialCase(N, (n1, n2)).occ_value())(x, y),
+        "z": np.vectorize(
+            lambda n1, n2: CltSpecialCase(N, (n1, n2)).intersection_p_approx()
+        )(x, y),
     },
     "expected_jaccard": {
         "title": f"Expected Jaccard index with $N={N}$",
