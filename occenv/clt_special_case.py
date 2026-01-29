@@ -38,9 +38,7 @@ class CltSpecialCase:
         return 1 - np.prod(1 - self.alpha)
 
     def union_var_approx(self) -> float:
-        """
-        Variance of individuals + covariance
-        """
+        """Variance of individuals + covariance"""
         p_union = self.union_p_approx()
         return self.var_individuals(p_union) + self.total_number * (
             self.total_number - 1
@@ -80,9 +78,7 @@ class CltSpecialCase:
         return np.prod(self.alpha)
 
     def intersection_var_approx(self) -> float:
-        """
-        Variance of individuals + covariance
-        """
+        """Variance of individuals + covariance"""
         p_intersect = self.intersection_p_approx()
         return self.var_individuals(p_intersect) + self.total_number * (
             self.total_number - 1
@@ -102,14 +98,13 @@ class CltSpecialCase:
         result = product / (self.total_number**k)
         return result
 
-    def occ_value(self):  # N * OCC value is the expected total intersection
+    def occ_value(self):
+        """N * OCC value is the expected total intersection"""
         return self.rho(list(range(self.party_number)))
 
     # --- Bivariate approximated results ---
     def bivariate_mu_approx(self) -> np.ndarray:
-        """
-        Output the mean matrix.
-        """
+        """Output the mean matrix."""
         return np.array(
             [
                 self.mu_sum_indicators(self.union_p_approx()),
@@ -118,9 +113,7 @@ class CltSpecialCase:
         )
 
     def bivariate_cov_approx(self) -> float:
-        """
-        Covariance between the union and intersection distributions.
-        """
+        """Covariance between the union and intersection distributions."""
         a = self.total_number * self.intersection_p_approx()
         b = (
             self.total_number
@@ -140,9 +133,7 @@ class CltSpecialCase:
         return a + b - c
 
     def bivariate_matrix_approx(self) -> np.ndarray:
-        """
-        Output the covariance matrix.
-        """
+        """Output the covariance matrix."""
         return np.array(
             [
                 [self.union_var_approx(), self.bivariate_cov_approx()],
@@ -194,24 +185,24 @@ class CltSpecialCase:
 
 
 if __name__ == "__main__":
-    ar = CltSpecialCase(2000, [1800, 1900, 1800, 1800])
+    ar = CltSpecialCase(100, [20, 30, 40, 50])
     # --- Univariate approximated results ---
     print("probability (intersection):", ar.intersection_p_approx())
     print("probability (union):", ar.union_p_approx())
     print("mean (union):", ar.mu_sum_indicators(ar.union_p_approx()))
     print("variance (union):", ar.union_var_approx())
-    print("variance (iid union):", ar.var_individuals(ar.union_p_approx()))
+    # print("variance (iid union):", ar.var_individuals(ar.union_p_approx()))
     print("mean (intersection):", ar.mu_sum_indicators(ar.intersection_p_approx()))
     print("variance (intersection):", ar.intersection_var_approx())
-    print(
-        "variance (iid intersection):", ar.var_individuals(ar.intersection_p_approx())
-    )
+    # print(
+    #     "variance (iid intersection):", ar.var_individuals(ar.intersection_p_approx())
+    # )
 
-    # --- Bivariate approximated results ---
-    print("covariance (bivariate):", ar.bivariate_cov_approx())
-    print("correlation (bivariate):", ar.bivariate_corr_approx())
-    print("mean (bivariate):", ar.bivariate_mu_approx())
-    print("matrix (bivariate):", ar.bivariate_matrix_approx())
-    print("mean (jaccard):", ar.jaccard_mu_approx())
-    print("variance (jaccard):", ar.jaccard_var_approx())
-    print("mean (jaccard simplified):", ar.jaccard_mu_approx_simplified())
+    # # --- Bivariate approximated results ---
+    # print("covariance (bivariate):", ar.bivariate_cov_approx())
+    # print("correlation (bivariate):", ar.bivariate_corr_approx())
+    # print("mean (bivariate):", ar.bivariate_mu_approx())
+    # print("matrix (bivariate):", ar.bivariate_matrix_approx())
+    # print("mean (jaccard):", ar.jaccard_mu_approx())
+    # print("variance (jaccard):", ar.jaccard_var_approx())
+    # print("mean (jaccard simplified):", ar.jaccard_mu_approx_simplified())

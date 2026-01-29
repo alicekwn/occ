@@ -2,6 +2,7 @@
 Approximated results for all the degree distributions using CLT.
 """
 
+import itertools
 import numpy as np
 
 
@@ -27,6 +28,7 @@ class CltDegreeVector:
         return coeffs
 
     def degree_prob(self, d: int) -> float:
+        """probability of a specific degree d"""
         return float(self.degree_pmf()[d])
 
     def z_mean(self, d: int) -> float:
@@ -71,6 +73,7 @@ class CltDegreeVector:
         return coeffs
 
     def pair_degree_prob(self, a: int, b: int) -> float:
+        """probability of a specific pair of degrees (a, b)"""
         return float(self.pair_degree_pmf()[a, b])
 
     def z_var(self, a: int) -> float:
@@ -99,3 +102,27 @@ class CltDegreeVector:
         return n * (n - 1) * q_ab - n * n * p_a * p_b
 
     # --- Degree distribution (more than one degree) ---
+
+    def z_means(self, degrees: list[int]) -> float:
+        """
+        E[Z_D] = sum of E[Z_d] for all d in D (set of required degrees).
+        """
+        return sum([self.z_mean(d) for d in degrees])
+
+    def z_vars(self, degrees: list[int]) -> float:
+        """
+        Var(Z_D) = sum of Var(Z_d) and covariance for all pairs of degrees in D.
+        """
+        var = sum([self.z_var(d) for d in degrees])
+        covar = sum(
+            [2 * self.z_cov(a, b) for a, b in itertools.combinations(degrees, 2)]
+        )  # times 2 because order doesn't matter in itertools.combinations
+        return var + covar
+
+
+if __name__ == "__main__":
+    approx = CltDegreeVector(100, [20, 30, 40, 50])
+    print(approx.z_means([1, 2, 3, 4]))  # mean of union
+    print(approx.z_vars([1, 2, 3, 4]))  # variance of union
+    print(approx.z_mean(4))  # mean of intersection
+    print(approx.z_var(4))  # variance of intersection
