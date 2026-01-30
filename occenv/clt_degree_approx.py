@@ -122,7 +122,7 @@ class CltDegreeVector:
 
 if __name__ == "__main__":
     approx = CltDegreeVector(100, [20, 30, 40, 50])
-    print(approx.z_means([1, 2, 3, 4]))  # mean of union
-    print(approx.z_vars([1, 2, 3, 4]))  # variance of union
+    print(approx.z_means([2, 3, 4]))  # mean of union
+    print(approx.z_vars([2, 3, 4]))  # variance of union
     print(approx.z_mean(4))  # mean of intersection
     print(approx.z_var(4))  # variance of intersection

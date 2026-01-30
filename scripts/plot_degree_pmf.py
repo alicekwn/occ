@@ -1,5 +1,7 @@
 """
-Plot the PMF of Z_d (number of items with degree d) and overlay simulation.
+Plot the PMF of
+(1) Z_d (number of items with degree d) and overlay simulation.
+(2) A_D=sum_d in D Z_d (number of items with degrees in D) and overlay simulation.
 """
 
 import numpy as np
@@ -46,18 +48,62 @@ def plot_degree_pmf(
     plt.show()
 
 
+def plot_degrees_pmf(
+    total_number: int,
+    shard_sizes: tuple[int, ...],
+    degrees: list[int],
+    repeats: int = 1000,
+):
+    """
+    Plot the PMF of Z_D (number of items with degrees in D) and overlay simulation.
+    """
+    approx = CltDegreeVector(total_number, shard_sizes)
+    sim = Simulate(total_number, shard_sizes)
+    xs = np.arange(total_number + 1)
+
+    approx_mean = approx.z_means(degrees)
+    approx_var = approx.z_vars(degrees)
+    approx_sigma = np.sqrt(approx_var) if approx_var > 0 else 0.0
+
+    # Simulation: counts of Z_D across repeats
+    degree_counts = sim.simulate_degree_count_repeat(repeats)
+    z_D_counts = degree_counts[:, degrees].sum(axis=1)
+
+    pmf_sim = np.bincount(z_D_counts, minlength=total_number + 1) / repeats
+    pmf_norm = discretize_normal_pmf(xs, approx_mean, approx_sigma)
+
+    plt.figure()
+    plt.bar(xs, pmf_sim, alpha=0.5, label=f"Simulation (repeats={repeats})")
+    plt.plot(
+        xs,
+        pmf_norm,
+        "r-",
+        lw=2,
+        label=f"Normal (μ={approx_mean:.2f}, σ={approx_sigma:.2f})",
+    )
+    plt.title(f"PMF of Z_D for D={degrees} (N={total_number}, sizes={shard_sizes})")
+    plt.xlabel("Z_D")
+    plt.ylabel("Probability")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
-    plot_degree_pmf(
+    # plot_degree_pmf(
+    #     total_number=100,
+    #     shard_sizes=(
+    #         20,
+    #         25,
+    #         30,
+    #         20,
+    #     ),
+    #     d=2,
+    #     repeats=int(1e5),
+    # )
+    plot_degrees_pmf(
         total_number=100,
-        shard_sizes=(
-            20,
-            25,
-            30,
-            20,
-        ),
-        d=2,
+        shard_sizes=(20, 30, 40, 50),
+        degrees=[2, 3, 4],
         repeats=int(1e5),
     )
-    # plot_degree_pmf(
-    #     total_number=100, shard_sizes=(90, 60, 70, 80), d=4, repeats=int(1e5)
-    # )
