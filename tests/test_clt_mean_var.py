@@ -1,5 +1,5 @@
 """
-Test the CLT approximated results vs analytical (combinatorial) results.
+Test the CLT approximated results vs combinatorial results.
 Testing whether the mean and variance matches.
 """
 
@@ -23,7 +23,7 @@ from occenv.comb_jaccard import CombinatorialJaccard
 )
 def test_approx(total_number, shard_sizes):
     """
-    Test that the (CLT) approximated mean and variance match the analytical mean and variance.
+    Test that the (CLT) approximated mean and variance match the combinatorial mean and variance.
     """
     univ = CombinatorialUnivariate(total_number, shard_sizes)
     biv = CombinatorialBivariate(total_number, shard_sizes)
