@@ -1,8 +1,9 @@
 """
 Plot the PMF of
-(1) Z_d (number of items with degree d) and overlay simulation.
-(2) A_D=sum_d in D Z_d (number of items with degrees in D) and overlay simulation.
-(3) T=LZ = sum l_d * Z_d and overlay simulation.
+(1) Z_d (number of items with degree d)
+(2) A_D=sum_d in D Z_d (number of items with degrees in D)
+(3) T=LZ = sum l_d * Z_d
+and overlay Monte Carlo simulation.
 """
 
 import numpy as np
@@ -107,6 +108,12 @@ def plot_degree_pmf_weighted(
     t_counts = degree_counts.dot(weights)
     t_min, t_max = t_counts.min(), t_counts.max()
 
+    # Approximated results: T=LZ ~ Normal(mean=approx_mean, var=approx_var)
+    approx = CltDegreeVector(total_number, shard_sizes)
+    approx_mean = approx.z_means_weighted(weights)
+    approx_var = approx.z_vars_weighted(weights)
+    approx_sigma = np.sqrt(approx_var) if approx_var > 0 else 0.0
+
     # Check if all weights are integers (then t_counts will be integers too)
     all_int_weights = all(float(w).is_integer() for w in weights)
     if all_int_weights:
@@ -115,6 +122,35 @@ def plot_degree_pmf_weighted(
         pmf_sim = np.bincount(t_shifted) / repeats
         xs = np.arange(len(pmf_sim)) + t_min
         bar_width = 1.0
+
+        # For integer weights, bin width = 1, so PDF and PMF align on same scale
+        pdf_norm = norm_pdf(xs, approx_mean, approx_sigma)
+
+        # Single axis plot (original method)
+        plt.figure()
+        plt.bar(
+            xs,
+            pmf_sim,
+            width=bar_width,
+            alpha=0.5,
+            label=f"Simulation (repeats={repeats})",
+        )
+        plt.plot(
+            xs,
+            pdf_norm,
+            "r-",
+            lw=2,
+            label=f"Normal (μ={approx_mean:.2f}, σ={approx_sigma:.2f})",
+        )
+        plt.title(
+            f"PMF of T=LZ for L={weights} (N={total_number}, sizes={shard_sizes})"
+        )
+        plt.xlabel("T")
+        plt.ylabel("Probability")
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
     else:
         # Use histogram for float weights
         # Determine bin width based on the smallest weight fraction
@@ -124,50 +160,46 @@ def plot_degree_pmf_weighted(
         pmf_sim = counts / repeats
         xs = (edges[:-1] + edges[1:]) / 2  # bin centers
 
-    # Approximated results: T=LZ ~ Normal(mean=approx_mean, var=approx_var)
-    approx = CltDegreeVector(total_number, shard_sizes)
-    approx_mean = approx.z_means_weighted(weights)
-    approx_var = approx.z_vars_weighted(weights)
-    approx_sigma = np.sqrt(approx_var) if approx_var > 0 else 0.0
-    pdf_norm = norm_pdf(xs, approx_mean, approx_sigma)
+        pdf_norm = norm_pdf(xs, approx_mean, approx_sigma)
 
-    # Create figure with twin axes
-    _, ax1 = plt.subplots()
+        # Create figure with twin axes
+        _, ax1 = plt.subplots()
 
-    # Left axis: PDF (continuous normal distribution)
-    ax1.plot(
-        xs,
-        pdf_norm,
-        "r-",
-        lw=2,
-        label=f"Normal PDF (μ={approx_mean:.2f}, σ={approx_sigma:.2f})",
-    )
-    ax1.set_xlabel("T")
-    ax1.set_ylabel("PDF (Probability Density)", color="r")
-    ax1.tick_params(axis="y", labelcolor="r")
-    ax1.set_ylim(bottom=0)
+        # Left axis: PDF (continuous normal distribution)
+        ax1.plot(
+            xs,
+            pdf_norm,
+            "r-",
+            lw=2,
+            label=f"Normal PDF (μ={approx_mean:.2f}, σ={approx_sigma:.2f})",
+        )
+        ax1.set_xlabel("T")
+        ax1.set_ylabel("PDF (Probability Density)")
+        ax1.tick_params(axis="y")
+        ax1.set_ylim(bottom=0)
 
-    # Right axis: PMF (discrete probabilities)
-    ax2 = ax1.twinx()
-    ax2.bar(
-        xs,
-        pmf_sim,
-        width=bar_width,
-        alpha=0.5,
-        label=f"Simulation PMF (repeats={repeats})",
-        color="blue",
-    )
-    ax2.set_ylabel("PMF (Probability Mass)", color="b")
-    ax2.tick_params(axis="y", labelcolor="b")
+        # Right axis: PMF (discrete probabilities)
+        ax2 = ax1.twinx()
+        ax2.bar(
+            xs,
+            pmf_sim,
+            width=bar_width,
+            alpha=0.5,
+            label=f"Simulation PMF (repeats={repeats})",
+        )
+        ax2.set_ylabel("PMF (Probability Mass)")
+        ax2.tick_params(axis="y")
 
-    # Combine legends
-    lines1, labels1 = ax1.get_legend_handles_labels()
-    lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc="best")
+        # Combine legends
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
 
-    plt.title(f"PMF of T=LZ for L={weights} (N={total_number}, sizes={shard_sizes})")
-    plt.tight_layout()
-    plt.show()
+        plt.title(
+            f"PMF of T=LZ for L={weights} (N={total_number}, sizes={shard_sizes})"
+        )
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == "__main__":
@@ -191,6 +223,6 @@ if __name__ == "__main__":
     plot_degree_pmf_weighted(
         total_number=100,
         shard_sizes=(20, 30, 40, 50),
-        weights=[-2, 3, 2.1, 4.2, -1.5],
+        weights=[1.5, 3.1, 2.2, 0, -3],
         repeats=int(1e5),
     )
