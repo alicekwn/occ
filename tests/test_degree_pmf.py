@@ -11,7 +11,8 @@ from occenv.simulate import Simulate
 @pytest.mark.parametrize(
     "total_number, shard_sizes, d_values, repeats",
     [
-        (100, (40, 50, 60, 70), (2, 3, 4), 5000),
+        (100, (40, 50, 60, 70), (0, 1, 2, 3, 4), 5000),
+        (1000, (400, 500, 600, 700, 800), (0, 1, 2, 3, 4, 5), 5000),
     ],
 )
 def test_degree_pmf_matches_simulation(total_number, shard_sizes, d_values, repeats):

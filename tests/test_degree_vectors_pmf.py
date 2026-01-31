@@ -14,9 +14,8 @@ from occenv.simulate import Simulate
 @pytest.mark.parametrize(
     "total_number, shard_sizes, weights, repeats, tolerance",
     [
-        (100, (40, 50, 60, 70), [0, 1.5, 2, -1, 3], 10000, 0.15),
-        (100, (20, 30, 40, 50), [-2, 3, 2, 4.2, -1.5], 10000, 0.15),
-        (200, (150, 140, 160), [0, 1, 1, 1], 10000, 0.15),  # union
+        (100, (40, 50, 60, 70), [-2, 3.1, 2, 4.2, -1.5], 100000, 0.01),
+        (1000, (400, 500, 600, 700), [-2, 3.1, 2, 4.2, -1.5], 100000, 0.01),
     ],
 )
 def test_pdf_integral_matches_pmf_sum(
