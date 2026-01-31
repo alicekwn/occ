@@ -101,7 +101,7 @@ class CltDegreeVector:
         q_ab = self.pair_degree_prob(a, b)
         return n * (n - 1) * q_ab - n * n * p_a * p_b
 
-    # --- Degree distribution (more than one degree) ---
+    # --- Degree distribution (more than one degree, weight 0 or 1 for each degree) ---
 
     def z_means(self, degrees: list[int]) -> float:
         """
@@ -119,10 +119,42 @@ class CltDegreeVector:
         )  # times 2 because order doesn't matter in itertools.combinations
         return var + covar
 
+    # --- Univariate weighted projection ---
+    def z_means_weighted(self, weights: list[float]) -> float:
+        """
+        Generalisation of weight 0 or 1 for each degree.
+
+        T:= LZ, where Z is degree-count vector
+        L = (l_0, l_1, ..., l_m) is a vector of weights
+        E[T] = sum of E[Z_d] * l_d for all d in [0,m].
+        """
+        z_vector_mean = self.degree_pmf() * self.total_number
+        return np.dot(z_vector_mean, weights)
+
+    def z_vars_weighted(self, weights: list[float]) -> float:
+        """
+        Var(T) = sum of Cov(Z_a, Z_b) * l_a * l_b for all pairs of degrees (a, b) in [0,m].
+        """
+        var = sum([self.z_var(a) * weights[a] ** 2 for a in range(len(weights))])
+        covar = sum(
+            [
+                self.z_cov(a, b) * weights[a] * weights[b]
+                for a in range(len(weights))
+                for b in range(len(weights))
+                if a != b
+            ]
+        )
+        return var + covar
+
 
 if __name__ == "__main__":
     approx = CltDegreeVector(100, [20, 30, 40, 50])
-    print(approx.z_means([2, 3, 4]))  # mean of union
-    print(approx.z_vars([2, 3, 4]))  # variance of union
-    print(approx.z_mean(4))  # mean of intersection
-    print(approx.z_var(4))  # variance of intersection
+    # print(approx.z_means([1, 2, 3, 4]))  # mean of union
+    # print(approx.z_vars([1, 2, 3, 4]))  # variance of union
+    # print(approx.z_mean(4))  # mean of intersection
+    # print(approx.z_var(4))  # variance of intersection
+    # print(approx.z_means_weighted([0, 1, 1, 1, 1]))  # mean of union
+    # print(approx.z_vars_weighted([0, 1, 1, 1, 1]))  # variance of union
+    # print(approx.z_means_weighted([0, 0, 0, 0, 1]))  # mean of intersection
+    # print(approx.z_vars_weighted([0, 0, 0, 0, 1]))  # variance of intersection
+    print(approx.z_means_weighted([-2, 3, 2.1, 4.2, -1.5]))

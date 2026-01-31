@@ -10,7 +10,11 @@ import numpy as np
 
 class CltSpecialCase:
     """
-    Approximated results for the union, intersection, bivariate, and jaccard index distributions using CLT.
+    Approximated results for the
+    (1) union, intersection,
+    (2) bivariate, and
+    (3) jaccard index distributions
+    using CLT.
     """
 
     def __init__(self, total_number: int, shard_sizes: list[int]):
@@ -145,7 +149,8 @@ class CltSpecialCase:
 
     def bivariate_corr_approx(self) -> float:
         """
-        Correlation between the union and intersection distributions, which is calculated as the covariance divided by the product of the standard deviations of the union and intersection distributions.
+        Correlation between the union and intersection distributions, calculated as:
+        covariance / the product of the standard deviations of the union and intersection distributions.
         """
         return self.bivariate_cov_approx() / (
             np.sqrt(self.union_var_approx()) * np.sqrt(self.intersection_var_approx())
@@ -154,6 +159,7 @@ class CltSpecialCase:
     # --- Jaccard index approximated results ---
 
     def jaccard_mu_approx(self) -> float:
+        """Approximation for the mean of the jaccard index distribution"""
         j = (
             self.intersection_p_approx() / self.union_p_approx()
             if self.union_p_approx() > 0
@@ -165,6 +171,7 @@ class CltSpecialCase:
         return j + second_delta
 
     def jaccard_var_approx(self) -> float:
+        """Approximation for the variance of the jaccard index distribution"""
         j = (
             self.intersection_p_approx() / self.union_p_approx()
             if self.union_p_approx() > 0
@@ -179,6 +186,7 @@ class CltSpecialCase:
         return a / b
 
     def jaccard_mu_approx_simplified(self) -> float:
+        """Simplified approximation for the mean of the jaccard index distribution, less accurate"""
         return (
             self.intersection_p_approx() / self.union_p_approx()
             if self.union_p_approx() > 0
