@@ -134,6 +134,8 @@ Result: test failed when at least one shard is too small or too big relative to 
 $A_D=\sum_{d\in D}Z_d$;
 
 $T=L\vec{Z}=\sum_{d=0}^m \ell_d Z_d$, where $L=(\ell_0,\ell_1,...,\ell_m)\in \mathbb{R}^{1\times (m+1)}$
+
+Each plot overlays the results of a Monte Carlo simulation.
 ```
 python scripts/plot_degree_pmf.py
 ```
