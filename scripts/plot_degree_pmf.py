@@ -2,6 +2,7 @@
 Plot the PMF of
 (1) Z_d (number of items with degree d) and overlay simulation.
 (2) A_D=sum_d in D Z_d (number of items with degrees in D) and overlay simulation.
+(3) T=LZ = sum l_d * Z_d and overlay simulation.
 """
 
 import numpy as np

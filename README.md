@@ -61,9 +61,11 @@ pip install -e ".[dev]"
 
 ---
 
-## Run plots for combinatorial results
+## Check combinatorial results
 
-### For univariate distributions
+### Run plots for combinatorial results
+
+#### Plots for univariate distributions
 
 Plot the PMF and its CLT approximation of P(union=X) and P(intersection=Y)
 ```
@@ -75,14 +77,14 @@ Plot the heatmap for different combinations of $n_1,n_2$ (when $m=2$), when unio
 python scripts/plot_2_parties_heatmap.py
 ```
 
-### For bivariate distribution
+#### Plots for bivariate distribution
 
 Plot the bivariate distribution of P(union=X, intersection=Y)  
 ```
 python scripts/plot_bivariate.py
 ```
 
-#### For Jaccard index distribution
+#### Plots for Jaccard index distribution
 
 Plot the PMF of Jaccard Index, together the CLT approx. 
 ```
@@ -126,10 +128,12 @@ Result: test failed when at least one shard is too small or too big relative to 
 ---
 ## CLT linear projection results
 
-### Univariate weighted projection
-Plot the normal approximation of $T=L\vec{Z}=\sum_{d=0}^m \ell_d Z_d$, 
+### Run plots for univariate weighted projections
 
-where $L=(\ell_0,\ell_1,...,\ell_m)\in \mathbb{R}^{1\times (m+1)}$.  
+#### Plots for cases $Z_d$, $A_D$, $T=LZ$
+$A_D=\sum_{d\in D}Z_d$;
+
+$T=L\vec{Z}=\sum_{d=0}^m \ell_d Z_d$, where $L=(\ell_0,\ell_1,...,\ell_m)\in \mathbb{R}^{1\times (m+1)}$
 ```
 python scripts/plot_degree_pmf.py
 ```

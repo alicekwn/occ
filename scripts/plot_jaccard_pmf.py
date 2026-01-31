@@ -1,6 +1,6 @@
 """
 This script plots the Jaccard index PMF for a given N and shard sizes.
-It also calculates the MAE and SSE of the empirical PMF and the approximated normal distribution.
+It also calculates the MAE and SSE of the combinatorial PMF and the CLT approximation.
 """
 
 from fractions import Fraction
