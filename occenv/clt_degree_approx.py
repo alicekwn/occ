@@ -101,7 +101,7 @@ class CltDegreeVector:
         q_ab = self.pair_degree_prob(a, b)
         return n * (n - 1) * q_ab - n * n * p_a * p_b
 
-    # --- Degree distribution (more than one degree, weight 0 or 1 for each degree) ---
+    # --- Degree distribution (weight 0 or 1 for each degree) ---
 
     def z_means(self, degrees: list[int]) -> float:
         """
