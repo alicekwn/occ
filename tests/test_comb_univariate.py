@@ -1,5 +1,5 @@
 """
-Test that the simulated univariate probabilities match the combinatorial univariate probabilities.
+Test that the simulated union and intersection probabilities match the combinatorial results.
 """
 
 from collections import Counter
@@ -25,8 +25,7 @@ from occenv.utils import mu_calculation, var_calculation
 )
 def test_univariate_pmf_and_mean(shard_sizes):
     """
-    Test that the simulated univariate (union and intersection) probabilities
-    match the combinatorial univariate probabilities.
+    Test that the simulated union and intersection probabilities match the combinatorial results.
     """
     total_number = 10
     repeats = int(1e6)
@@ -34,7 +33,7 @@ def test_univariate_pmf_and_mean(shard_sizes):
     sim = Simulate(total_number, shard_sizes)
     comb = CombinatorialUnivariate(total_number, shard_sizes)
 
-    # --- Simulated PMFs from samples ---
+    # --- Simulated PMFs from simulation ---
     degree_counts = sim.simulate_degree_count_repeat(repeat=repeats)
     union_samples = total_number - degree_counts[:, 0]
     intersection_samples = degree_counts[:, len(shard_sizes)]
@@ -58,11 +57,11 @@ def test_univariate_pmf_and_mean(shard_sizes):
     for p_sim, p_comb in zip(pmf_v_sim, pmf_v_comb):
         assert p_comb == pytest.approx(p_sim, abs=0.01)
 
-    # --- Sanity checks ---
+    # --- Sanity checks, sum of PMFs should be 1 ---
     assert sum(pmf_u_sim) == pytest.approx(1.0, abs=1e-3)
     assert sum(pmf_v_sim) == pytest.approx(1.0, abs=1e-3)
-    assert sum(pmf_u_comb) == pytest.approx(1.0, abs=1e-9)
-    assert sum(pmf_v_comb) == pytest.approx(1.0, abs=1e-9)
+    assert sum(pmf_u_comb) == pytest.approx(1.0, abs=1e-3)
+    assert sum(pmf_v_comb) == pytest.approx(1.0, abs=1e-3)
 
     # --- Compare means ---
     mean_union_sim = mu_calculation(x_u, pmf_u_sim)

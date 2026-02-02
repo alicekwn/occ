@@ -67,28 +67,28 @@ pip install -e ".[dev]"
 
 #### Plots for univariate distributions
 
-Plot the PMF and its CLT approximation of P(union=X) and P(intersection=Y)
+Plot its PMF and its CLT approximation of P(union=X) and P(intersection=Y)
 ```
-python scripts/plot_univariate_pmf.py
+python scripts/plot_comb_clt_univariate.py
 ```
 
 Plot the heatmap for different combinations of $n_1,n_2$ (when $m=2$), when union / intersection values are fixed
 ```
-python scripts/plot_2_parties_heatmap.py
+python scripts/plot_comb_heatmap.py
 ```
 
 #### Plots for bivariate distribution
 
 Plot the bivariate distribution of P(union=X, intersection=Y)  
 ```
-python scripts/plot_bivariate.py
+python scripts/plot_comb_bivariate.py
 ```
 
 #### Plots for Jaccard index distribution
 
 Plot the PMF of Jaccard Index, together the CLT approx. 
 ```
-python scripts/plot_jaccard_pmf.py
+python scripts/plot_comb_clt_jaccard.py
 ```
 
 ---
@@ -104,7 +104,7 @@ Test for the 3 distributions:
 3. jaccard index 
 
 ```
-pytest tests/test_comb_univariate_pmf.py tests/test_comb_bivariate_pmf.py tests/test_comb_jaccard_pmf.py
+pytest tests/test_comb_univariate.py tests/test_comb_bivariate.py tests/test_comb_jaccard.py
 ```
 #### Bivariate distribution result sanity check
 Test whether the marginal probabilities of bivariate distribution adds up
@@ -115,13 +115,13 @@ pytest tests/test_comb_bivariate_marginal.py
 #### Combinatorial result VS CLT result
 Test whether the mean and variance match:
 ```
-pytest tests/test_clt_mean_var.py
+pytest tests/test_clt_comb_mean_var.py
 ```
 Result: test passed, even at edge cases
 
 Test whether the pmf match (after discretising the CLT normal distribution):
 ```
-pytest tests/test_clt_pmf.py
+pytest tests/test_clt_comb_pmf.py
 ``` 
 Result: test failed when at least one shard is too small or too big relative to the total number (edge). 
 
@@ -137,23 +137,23 @@ $X=L\vec{Z}=\sum_{d=0}^m \ell_d Z_d$, where $L=(\ell_0,\ell_1,...,\ell_m)\in \ma
 
 Each plot overlays the results of a Monte Carlo simulation.
 ```
-python scripts/plot_degree_pmf.py
+python scripts/plot_clt_sim_degree_vector.py
 ```
 
 #### Edge cases for univariate distributions
 For univariate weighted projection with weights either $0$ or $1$, the edge cases can be approximated better with Moment-Matched binomial distribution.
 ```
-python plot_edge_cases.py
+python plot_clt_sim_edge_cases.py
 ```
 Otherwise, when weights aren't $0$s or $1$s, poisson distribution is better.
 
 ### Test CLT result VS Monte Carlo simulation
 Test whether the degree-count vector's probability is aligning with simulation.
 ```
-pytest tests/test_degree_prob.py
+pytest tests/test_clt_degree_prob.py
 ```
 Test whether the CLT approximation for univariate weighted projection is aligning with simulation. 
 ```
-pytest tests/test_univariate_projection_pmf.py
+pytest tests/test_clt_univariate_projection.py
 ```
 

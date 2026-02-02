@@ -1,8 +1,6 @@
 """
-Test the moment-matched binomial approximated results vs combinatorial results.
+Test the moment-matched binomial approximated results vs simulated results.
 Testing whether each element of the PMF matches.
-
-Moment-matched binomial approximation is used to approximate the bivariate distribution.
 """
 
 import pytest

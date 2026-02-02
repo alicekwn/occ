@@ -20,7 +20,7 @@ from occenv.comb_univariate import CombinatorialUnivariate
 )
 def test_bivariate_marginals_match_univariate(shard_sizes):
     """
-    Test whether the marginal probabilities of bivariate distribution match univariate probabilities.
+    Test whether the marginal probabilities of bivariate distribution match the union and intersection probabilities.
     (Purely analytical identity checks, no simulation involved)
     """
     total_number = 200

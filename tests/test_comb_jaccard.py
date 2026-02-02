@@ -1,5 +1,5 @@
 """
-Test that the combinatorial Jaccard index CDF matches the simulated Jaccard index CDF.
+Test if the CDF and mean of the combinatorial Jaccard index matches the simulated Jaccard index.
 """
 
 import pytest
@@ -18,7 +18,8 @@ from occenv.comb_bivariate import CombinatorialBivariate
 )
 def test_jaccard_cdf(total_number, shard_sizes, thresholds):
     """
-    Test that the combinatorial Jaccard index CDF matches the simulated Jaccard index CDF.
+    Test that the combinatorial Jaccard index CDF matches the simulated Jaccard index CDF
+    at each given threshold.
     """
     repeats = int(1e6)
     sim = Simulate(total_number, shard_sizes)

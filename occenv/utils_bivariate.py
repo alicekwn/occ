@@ -1,3 +1,7 @@
+"""
+Utility functions for plotting bivariate distributions.
+"""
+
 import numpy as np
 from matplotlib.patches import Ellipse
 from scipy.stats import chi2
@@ -12,46 +16,59 @@ class Gaussian2D:
     def __init__(
         self,
         mu: list[float, float],
-        Sigma: list[list[float, float], list[float, float]],
+        cov_matrix: list[list[float, float], list[float, float]],
     ):
         self.mu = np.array(mu, float).reshape(2)  # mean vector
-        self.Sigma = np.array(Sigma, float).reshape(2, 2)  # covariance matrix
-        self._Sinv = np.linalg.inv(self.Sigma)  # inverse of the covariance matrix
+        self.cov_matrix = np.array(cov_matrix, float).reshape(2, 2)  # covariance matrix
+        self._sinv = np.linalg.inv(self.cov_matrix)  # inverse of the covariance matrix
         self._det = float(
-            np.linalg.det(self.Sigma)
+            np.linalg.det(self.cov_matrix)
         )  # determinant of the covariance matrix
         self._chol = None  # Cholesky decomposition
 
         # Compute eigendecomposition of the covariance matrix
-        evals, evecs = np.linalg.eigh(self.Sigma)
+        evals, evecs = np.linalg.eigh(self.cov_matrix)
         order = evals.argsort()[::-1]
         self.evals = evals[order]  # eigenvalues (largest first)
         self.evecs = evecs[:, order]  # eigenvectors (columns, largest eigenvalue first)
 
     @property
-    def Sinv(self):
-        return self._Sinv
+    def sinv(self):
+        """
+        Inverse of the covariance matrix.
+        """
+        return self._sinv
 
     @property
     def det(self):
+        """
+        Determinant of the covariance matrix.
+        """
         return self._det
 
     @property
     def chol(self):
+        """
+        Cholesky decomposition of the covariance matrix.
+        """
         if self._chol is None:
             self._chol = np.linalg.cholesky(
-                self.Sigma
+                self.cov_matrix
             )  # calculate cholesky decomposition
         return self._chol
 
     def mahalanobis2(self, X):
-        """Return M^2 for points X (...,2). M² = (x - μ)ᵀ Σ⁻¹ (x - μ)"""
+        """
+        Return M^2 for points X (...,2). M² = (x - μ)ᵀ Σ⁻¹ (x - μ)
+        """
         X = np.asarray(X, float)
         dX = X - self.mu
-        return np.einsum("...i,ij,...j->...", dX, self.Sinv, dX)
+        return np.einsum("...i,ij,...j->...", dX, self.sinv, dX)
 
     def pdf(self, X):
-        """Unnormalized-safe 2D Gaussian pdf (continuous) at points X (...,2)."""
+        """
+        Unnormalized-safe 2D Gaussian pdf (continuous) at points X (...,2).
+        """
         M2 = self.mahalanobis2(X)
         const = 1.0 / (2.0 * np.pi * np.sqrt(self.det))
         return const * np.exp(
@@ -61,12 +78,14 @@ class Gaussian2D:
     def whiten(self, X):
         """
         Perform whitening transformation, so mean becomes 0 and covariance becomes identity matrix.
-        z = L^{-1}(x - mu) with LL^T = Sigma."""
+        z = L^{-1}(x - mu) with LL^T = Sigma.
+        """
         X = np.asarray(X, float)
         return np.linalg.solve(self.chol, (X - self.mu).T).T
 
     def ellipse(self, ax, p=0.95, **kw):
-        """Add a confidence ellipse for mass p.
+        """
+        Add a confidence ellipse for mass p.
         The confidence ellipse is the region that contains p of the data.
         """
         c = float(

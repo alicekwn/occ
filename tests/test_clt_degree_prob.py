@@ -9,15 +9,15 @@ from occenv.simulate import Simulate
 
 
 @pytest.mark.parametrize(
-    "total_number, shard_sizes, d_values, repeats",
+    "total_number, shard_sizes, repeats",
     [
-        (100, (40, 50, 60, 70), (0, 1, 2, 3, 4), 5000),
-        (1000, (400, 500, 600, 700, 800), (0, 1, 2, 3, 4, 5), 5000),
+        (100, (40, 50, 60, 70), 5000),
+        (1000, (400, 500, 600, 700, 800), 5000),
     ],
 )
-def test_degree_pmf_matches_simulation(total_number, shard_sizes, d_values, repeats):
+def test_degree_pmf_matches_simulation(total_number, shard_sizes, repeats):
     """
-    Test that the (CLT) approximated degree distribution matches the simulation.
+    Test that the (CLT) approximated degree distribution (all degree counts) matches the simulation.
     """
     approx = CltDegreeVector(total_number, shard_sizes)
     sim = Simulate(total_number, shard_sizes)
@@ -25,5 +25,5 @@ def test_degree_pmf_matches_simulation(total_number, shard_sizes, d_values, repe
 
     # Estimate p_d from simulation: average count for degree d divided by N
     p_sim = counts.mean(axis=0) / total_number
-    for d in d_values:
+    for d in range(len(shard_sizes) + 1):
         assert approx.degree_prob(d) == pytest.approx(p_sim[d], abs=0.03)

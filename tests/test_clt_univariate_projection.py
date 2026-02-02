@@ -1,6 +1,6 @@
 """
 Test the distribution of X=LZ against simulation.
-X=LZ, where Z is degree-count vector and L is a vector of weights (any real numbers).
+Z is degree-count vector and L is a vector of weights (any real numbers).
 """
 
 import numpy as np
@@ -23,7 +23,6 @@ def test_pdf_integral_matches_pmf_sum(
 ):
     """
     Test that the PDF integral from μ-σ/4 to μ+σ/4 matches the PMF sum in that range.
-
     The PDF integral ∫[μ-σ/4 to μ+σ/4] f(x) dx should approximate
     the PMF sum P(μ-σ/4 < X ≤ μ+σ/4) from simulation.
     """

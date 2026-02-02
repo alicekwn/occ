@@ -1,5 +1,5 @@
 """
-This script plots the heatmap of results when there are 2 parties.
+This script plots the heatmap of union, intersection, jaccard, when there are 2 parties.
 """
 
 import numpy as np

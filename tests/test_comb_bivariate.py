@@ -1,5 +1,6 @@
 """
 Test that the simulated bivariate event probability matches the combinatorial bivariate probability.
+For each specific (u, v) pair.
 """
 
 import pytest
